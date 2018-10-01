@@ -27,17 +27,28 @@ public class PictureClassification {
 		this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.frame.setLayout(null);
 
-		paint= new Paint();
+		/*paintOriginal = new PaintOriginal();
+		paintOriginal.setBounds(10, 10, Constants.DEFAULT_SIZE.width, Constants.DEFAULT_SIZE.height);
+		this.frame.getContentPane().add(paintOriginal);*/
+
+		paint = new Paint();
 		paint.setBounds(10, 10, Constants.DEFAULT_SIZE.width, Constants.DEFAULT_SIZE.height);
-		this.frame.getContentPane().add(paint);
+		// // getContentPane().add(entry);
+		//
+		this.frame.add(paint);
+
+		BinaryLayer binaryLayer = new BinaryLayer((int) Constants.BINARY_LAYER.getWidth(), (int) Constants.BINARY_LAYER.getHeight());
+		binaryLayer.setBounds(320, 10, ((int) Constants.BINARY_LAYER.getWidth()) * Constants.BINARY_LAYER_SCALE, ((int) Constants.BINARY_LAYER.getHeight()) * Constants.BINARY_LAYER_SCALE);
+		paint.setSample(binaryLayer);
+
+		this.frame.add(binaryLayer);
 
 		JButton Learn=new JButton("Digit 6");
-		Learn.setBounds(320, 10, 100, 25);
+		Learn.setBounds(320, 255, 100, 25);
 		Learn.addActionListener(new ActionListener(){
-
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				pct.learning(paint.image, 0);
+				//pct.learning(paint.image, 0);
 			}
 		});
 		this.frame.add(Learn);
@@ -47,16 +58,16 @@ public class PictureClassification {
 		progressBar6 = new JProgressBar(0, 100);
 		progressBar6.setValue(0);
 		progressBar6.setStringPainted(true);
-		progressBar6.setBounds(430, 15, 150, 15);
+		progressBar6.setBounds(430, 260, 130, 15);
 		this.frame.add(progressBar6);
 
 		JButton Learn2=new JButton("Digit 9");
-		Learn2.setBounds(320, 50, 100, 25);
+		Learn2.setBounds(320, 285, 100, 25);
 		Learn2.addActionListener(new ActionListener(){
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				pct.learning(paint.image, 1);
+				//pct.learning(paintOriginal.image, 1);
 			}
 		});
 		this.frame.add(Learn2);
@@ -66,26 +77,26 @@ public class PictureClassification {
 		progressBar9 = new JProgressBar(0, 100);
 		progressBar9.setValue(0);
 		progressBar9.setStringPainted(true);
-		progressBar9.setBounds(430, 55, 150, 15);
+		progressBar9.setBounds(430, 290, 130, 15);
 		this.frame.add(progressBar9);
 
 
 		JButton classification = new JButton("Classification");
-		classification.setBounds(320, 90, 100, 25);
+		classification.setBounds(320, 320, 100, 25);
 		classification.addActionListener(new ActionListener(){
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				double o = pct.output(paint.image);
+				//double o = pct.output(paintOriginal.image);
 				//l3.setText(""+o);
-				progressBar6.setValue((new Double((1 - o) * 100)).intValue());
-				progressBar9.setValue((new Double(o * 100)).intValue());
+				//progressBar6.setValue((new Double((1 - o) * 100)).intValue());
+				//progressBar9.setValue((new Double(o * 100)).intValue());
 			}
 		});
 		this.frame.add(classification);
 
 		JButton export = new JButton("Export");
-		export.setBounds(430, 90, 100, 25);
+		export.setBounds(430, 320, 100, 25);
 		export.addActionListener(new ActionListener(){
 
 			@Override
@@ -101,7 +112,7 @@ public class PictureClassification {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				paint.clear();
+				//paintOriginal.clear();
 //				l3.setText("");
 				progressBar6.setValue(0);
 				progressBar9.setValue(0);
