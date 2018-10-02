@@ -39,7 +39,7 @@ public class PictureClassification {
 
 		BinaryLayer binaryLayer = new BinaryLayer((int) Constants.BINARY_LAYER.getWidth(), (int) Constants.BINARY_LAYER.getHeight());
 		binaryLayer.setBounds(320, 10, ((int) Constants.BINARY_LAYER.getWidth()) * Constants.BINARY_LAYER_SCALE, ((int) Constants.BINARY_LAYER.getHeight()) * Constants.BINARY_LAYER_SCALE);
-		paint.setSample(binaryLayer);
+		paint.setBinaryLayer(binaryLayer);
 
 		this.frame.add(binaryLayer);
 
@@ -87,6 +87,7 @@ public class PictureClassification {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
+				paint.convertBinaryLayer();
 				//double o = pct.output(paintOriginal.image);
 				//l3.setText(""+o);
 				//progressBar6.setValue((new Double((1 - o) * 100)).intValue());
@@ -112,7 +113,9 @@ public class PictureClassification {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				//paintOriginal.clear();
+				paint.clear();
+				binaryLayer.getData().clear();
+				binaryLayer.repaint();
 //				l3.setText("");
 				progressBar6.setValue(0);
 				progressBar9.setValue(0);

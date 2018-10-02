@@ -22,11 +22,11 @@ public class Paint extends JPanel {
 
 	protected BinaryLayer sample;
 
-	protected int downSampleLeft;
+	protected int boundLeft;
 
-	protected int downSampleRight;
+	protected int boundRight;
 
-	protected int downSampleTop;
+	protected int boundTop;
 
 	protected int downSampleBottom;
 
@@ -56,8 +56,8 @@ public class Paint extends JPanel {
 		g.setColor(Color.black);
 		g.drawRect(0, 0, getWidth(), getHeight());
 		g.setColor(Color.red);
-		g.drawRect(downSampleLeft, downSampleTop, downSampleRight
-				- downSampleLeft, downSampleBottom - downSampleTop);
+		g.drawRect(boundLeft, boundTop, boundRight
+				- boundLeft, downSampleBottom - boundTop);
 
 	}
 
@@ -81,7 +81,7 @@ public class Paint extends JPanel {
 		lastY = e.getY();
 	}
 
-	public void setSample(BinaryLayer s) {
+	public void setBinaryLayer(BinaryLayer s) {
 		sample = s;
 	}
 
@@ -112,7 +112,7 @@ public class Paint extends JPanel {
 		// top line
 		for (int y = 0; y < h; y++) {
 			if (!hLineClear(y)) {
-				downSampleTop = y;
+				boundTop = y;
 				break;
 			}
 
@@ -127,23 +127,23 @@ public class Paint extends JPanel {
 
 		for (int x = 0; x < w; x++) {
 			if (!vLineClear(x)) {
-				downSampleLeft = x;
+				boundLeft = x;
 				break;
 			}
 		}
 
 		for (int x = w - 1; x >= 0; x--) {
 			if (!vLineClear(x)) {
-				downSampleRight = x;
+				boundRight = x;
 				break;
 			}
 		}
 	}
 
-	protected boolean downSampleQuadrant(int x, int y) {
+	protected boolean convertBinaryLayerQuadrant(int x, int y) {
 		int w = entryImage.getWidth(this);
-		int startX = (int) (downSampleLeft + (x * ratioX));
-		int startY = (int) (downSampleTop + (y * ratioY));
+		int startX = (int) (boundLeft + (x * ratioX));
+		int startY = (int) (boundTop + (y * ratioY));
 		int endX = (int) (startX + ratioX);
 		int endY = (int) (startY + ratioY);
 
@@ -159,10 +159,10 @@ public class Paint extends JPanel {
 		return false;
 	}
 
-	protected boolean downSampleQuadrant(int x, int y, Image img) {
+	protected boolean convertBinaryLayerQuadrant(int x, int y, Image img) {
 		int w = img.getWidth(this);
-		int startX = (int) (downSampleLeft + (x * ratioX));
-		int startY = (int) (downSampleTop + (y * ratioY));
+		int startX = (int) (boundLeft + (x * ratioX));
+		int startY = (int) (boundTop + (y * ratioY));
 		int endX = (int) (startX + ratioX);
 		int endY = (int) (startY + ratioY);
 
@@ -187,7 +187,7 @@ public class Paint extends JPanel {
 		return false;
 	}
 
-	public void downSample(Image fullTextImage, int wstart, int hstart,
+	public void convertBinaryLayer(Image fullTextImage, int wstart, int hstart,
 			int wend, int hend, int iw, int ih) {
 		if (wend == -1)
 			wend = entryImage.getWidth(this);
@@ -202,20 +202,20 @@ public class Paint extends JPanel {
 			pixelMaps = (int[]) grabber.getPixels();
 
 			BinaryData data = sample.getData();
-			downSampleLeft = wstart;
-			downSampleRight = wend;
-			downSampleTop = hstart;
+			boundLeft = wstart;
+			boundRight = wend;
+			boundTop = hstart;
 			// downSampleBottom = hstart + hend;
 			downSampleBottom = hend;
 
-			ratioX = (double) (downSampleRight - downSampleLeft)
+			ratioX = (double) (boundRight - boundLeft)
 					/ (double) data.getWidth();
-			ratioY = (double) (downSampleBottom - downSampleTop)
+			ratioY = (double) (downSampleBottom - boundTop)
 					/ (double) data.getHeight();
 
 			for (int y = 0; y < data.getHeight(); y++) {
 				for (int x = 0; x < data.getWidth(); x++) {
-					if (downSampleQuadrant(x, y, fullTextImage))
+					if (convertBinaryLayerQuadrant(x, y, fullTextImage))
 						data.setData(x, y, true);
 					else
 						data.setData(x, y, false);
@@ -228,7 +228,7 @@ public class Paint extends JPanel {
 		}
 	}
 
-	public void downSample() {
+	public void convertBinaryLayer() {
 		int w = entryImage.getWidth(this);
 		int h = entryImage.getHeight(this);
 
@@ -241,14 +241,14 @@ public class Paint extends JPanel {
 
 			BinaryData data = sample.getData();
 
-			ratioX = (double) (downSampleRight - downSampleLeft + 1)
+			ratioX = (double) (boundRight - boundLeft + 1)
 					/ (double) data.getWidth();
-			ratioY = (double) (downSampleBottom - downSampleTop + 1)
+			ratioY = (double) (downSampleBottom - boundTop + 1)
 					/ (double) data.getHeight();
 
 			for (int y = 0; y < data.getHeight(); y++) {
 				for (int x = 0; x < data.getWidth(); x++) {
-					if (downSampleQuadrant(x, y))
+					if (convertBinaryLayerQuadrant(x, y))
 						data.setData(x, y, true);
 					else
 						data.setData(x, y, false);
@@ -264,7 +264,7 @@ public class Paint extends JPanel {
 	public void clear() {
 		this.entryGraphics.setColor(Color.white);
 		this.entryGraphics.fillRect(0, 0, getWidth(), getHeight());
-		this.downSampleBottom = this.downSampleTop = this.downSampleLeft = this.downSampleRight = 0;
+		this.downSampleBottom = this.boundTop = this.boundLeft = this.boundRight = 0;
 		repaint();
 	}
 }
