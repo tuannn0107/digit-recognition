@@ -1,11 +1,12 @@
 package com.hvtien.digitrecognition;
 
+
 import java.awt.AWTEvent;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.MouseEvent;
-import java.awt.image.PixelGrabber;
+import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
 
@@ -20,7 +21,7 @@ public class Paint extends JPanel {
 
 	protected int lastY = -1;
 
-	protected BinaryLayer sample;
+	protected BinaryLayer binaryLayer;
 
 	protected int boundLeft;
 
@@ -28,13 +29,11 @@ public class Paint extends JPanel {
 
 	protected int boundTop;
 
-	protected int downSampleBottom;
+	protected int boundBottom;
 
 	protected double ratioX;
 
 	protected double ratioY;
-
-	protected int[] pixelMaps;
 
 	Paint() {
 		enableEvents(AWTEvent.MOUSE_MOTION_EVENT_MASK
@@ -56,8 +55,8 @@ public class Paint extends JPanel {
 		g.setColor(Color.black);
 		g.drawRect(0, 0, getWidth(), getHeight());
 		g.setColor(Color.red);
-		g.drawRect(boundLeft, boundTop, boundRight
-				- boundLeft, downSampleBottom - boundTop);
+		g.drawRect(boundLeft - 1, boundTop - 1, boundRight
+				- boundLeft + 2, boundBottom - boundTop + 2);
 
 	}
 
@@ -82,36 +81,59 @@ public class Paint extends JPanel {
 	}
 
 	public void setBinaryLayer(BinaryLayer s) {
-		sample = s;
+		binaryLayer = s;
 	}
 
-	public BinaryLayer getSample() {
-		return sample;
+	public BinaryLayer getBinaryLayer() {
+		return binaryLayer;
 	}
 
+
+	/**
+	 * Check if the horizontal line contain paint of digit
+	 *
+	 * @param y height line of image
+	 * @return
+	 */
 	protected boolean hLineClear(int y) {
 		int w = entryImage.getWidth(this);
+		BufferedImage bufferedImage = (BufferedImage) entryImage;
 		for (int i = 0; i < w; i++) {
-			if (pixelMaps[(y * w) + i] != -1)
-				return false;
+			if (bufferedImage.getRGB(i, y) == Color.BLACK.getRGB())
+				return true;
 		}
-		return true;
+		return false;
 	}
 
+
+	/**
+	 * Check if the vertical line contain paint of digit
+	 *
+	 * @param x width line of image
+	 * @return
+	 */
 	protected boolean vLineClear(int x) {
-		int w = entryImage.getWidth(this);
 		int h = entryImage.getHeight(this);
+
+		BufferedImage bufferedImage = (BufferedImage) entryImage;
 		for (int i = 0; i < h; i++) {
-			if (pixelMaps[(i * w) + x] != -1)
-				return false;
+			if (bufferedImage.getRGB(x, i) == Color.BLACK.getRGB())
+				return true;
 		}
-		return true;
+		return false;
 	}
 
+
+	/**
+	 * find bound of image
+	 *
+	 * @param w
+	 * @param h
+	 */
 	protected void findBounds(int w, int h) {
 		// top line
 		for (int y = 0; y < h; y++) {
-			if (!hLineClear(y)) {
+			if (hLineClear(y)) {
 				boundTop = y;
 				break;
 			}
@@ -119,152 +141,89 @@ public class Paint extends JPanel {
 		}
 
 		for (int y = h - 1; y >= 0; y--) {
-			if (!hLineClear(y)) {
-				downSampleBottom = y;
+			if (hLineClear(y)) {
+				boundBottom = y;
 				break;
 			}
 		}
 
 		for (int x = 0; x < w; x++) {
-			if (!vLineClear(x)) {
+			if (vLineClear(x)) {
 				boundLeft = x;
 				break;
 			}
 		}
 
 		for (int x = w - 1; x >= 0; x--) {
-			if (!vLineClear(x)) {
+			if (vLineClear(x)) {
 				boundRight = x;
 				break;
 			}
 		}
 	}
 
-	protected boolean convertBinaryLayerQuadrant(int x, int y) {
+
+	/**
+	 * Check if it is able to convert to binary layer at coordinate x,y
+	 *
+	 * @param xCoor
+	 * @param yCoor
+	 * @return
+	 */
+	protected boolean isAbleConverted(int xCoor, int yCoor) {
 		int w = entryImage.getWidth(this);
-		int startX = (int) (boundLeft + (x * ratioX));
-		int startY = (int) (boundTop + (y * ratioY));
+		BufferedImage bufferedImage = (BufferedImage) entryImage;
+
+		int startX = (int) (boundLeft + (xCoor * ratioX));
 		int endX = (int) (startX + ratioX);
+
+		int startY = (int) (boundTop + (yCoor * ratioY));
 		int endY = (int) (startY + ratioY);
 
-		for (int yy = startY; yy <= endY; yy++) {
-			for (int xx = startX; xx <= endX; xx++) {
-				int loc = xx + (yy * w);
-
-				if (pixelMaps[loc] != -1)
+		for (int y = startY; y <= endY; y++) {
+			for (int x = startX; x <= endX; x++) {
+				if (bufferedImage.getRGB(x, y) == Color.BLACK.getRGB())
 					return true;
 			}
 		}
-
 		return false;
 	}
 
-	protected boolean convertBinaryLayerQuadrant(int x, int y, Image img) {
-		int w = img.getWidth(this);
-		int startX = (int) (boundLeft + (x * ratioX));
-		int startY = (int) (boundTop + (y * ratioY));
-		int endX = (int) (startX + ratioX);
-		int endY = (int) (startY + ratioY);
 
-		for (int yy = startY; yy <= endY; yy++) {
-			for (int xx = startX; xx <= endX; xx++) {
-				int loc = xx + (yy * w);
-
-				int p = pixelMaps[loc];
-				int r = 0xff & (p >> 16);
-				int g = 0xff & (p >> 8);
-				int b = 0xff & (p);
-				int intensity = (r + g + b) / 3;
-				if (intensity > 150) {
-					// return false;
-				} else {
-					return true;
-				}
-
-			}
-		}
-
-		return false;
-	}
-
-	public void convertBinaryLayer(Image fullTextImage, int wstart, int hstart,
-			int wend, int hend, int iw, int ih) {
-		if (wend == -1)
-			wend = entryImage.getWidth(this);
-		if (hend == -1)
-			hend = entryImage.getHeight(this);
-
-		PixelGrabber grabber = new PixelGrabber(fullTextImage, 0, 0, iw, ih,
-				true);
-		try {
-
-			grabber.grabPixels();
-			pixelMaps = (int[]) grabber.getPixels();
-
-			BinaryData data = sample.getData();
-			boundLeft = wstart;
-			boundRight = wend;
-			boundTop = hstart;
-			// downSampleBottom = hstart + hend;
-			downSampleBottom = hend;
-
-			ratioX = (double) (boundRight - boundLeft)
-					/ (double) data.getWidth();
-			ratioY = (double) (downSampleBottom - boundTop)
-					/ (double) data.getHeight();
-
-			for (int y = 0; y < data.getHeight(); y++) {
-				for (int x = 0; x < data.getWidth(); x++) {
-					if (convertBinaryLayerQuadrant(x, y, fullTextImage))
-						data.setData(x, y, true);
-					else
-						data.setData(x, y, false);
-				}
-			}
-
-			sample.repaint();
-			// repaint();
-		} catch (InterruptedException e) {
-		}
-	}
-
-	public void convertBinaryLayer() {
+	/**
+	 * convert digit from paint to binary Layer
+	 *
+	 */
+	public BinaryData convertBinaryLayer() {
 		int w = entryImage.getWidth(this);
 		int h = entryImage.getHeight(this);
 
-		PixelGrabber grabber = new PixelGrabber(entryImage, 0, 0, w, h, true);
-		try {
-			grabber.grabPixels();
-			pixelMaps = (int[]) grabber.getPixels();
+		findBounds(w, h);
 
-			findBounds(w, h);
+		BinaryData data = binaryLayer.getData();
 
-			BinaryData data = sample.getData();
+		ratioX = (double) (boundRight - boundLeft + 1)
+				/ (double) data.getWidth();
+		ratioY = (double) (boundBottom - boundTop + 1)
+				/ (double) data.getHeight();
 
-			ratioX = (double) (boundRight - boundLeft + 1)
-					/ (double) data.getWidth();
-			ratioY = (double) (downSampleBottom - boundTop + 1)
-					/ (double) data.getHeight();
-
-			for (int y = 0; y < data.getHeight(); y++) {
-				for (int x = 0; x < data.getWidth(); x++) {
-					if (convertBinaryLayerQuadrant(x, y))
-						data.setData(x, y, true);
-					else
-						data.setData(x, y, false);
-				}
+		for (int y = 0; y < data.getHeight(); y++) {
+			for (int x = 0; x < data.getWidth(); x++) {
+				if (isAbleConverted(x, y))
+					data.setData(x, y, true);
+				else
+					data.setData(x, y, false);
 			}
-
-			sample.repaint();
-			repaint();
-		} catch (InterruptedException e) {
 		}
+
+		return data;
 	}
+
 
 	public void clear() {
 		this.entryGraphics.setColor(Color.white);
 		this.entryGraphics.fillRect(0, 0, getWidth(), getHeight());
-		this.downSampleBottom = this.boundTop = this.boundLeft = this.boundRight = 0;
+		this.boundBottom = this.boundTop = this.boundLeft = this.boundRight = 0;
 		repaint();
 	}
 }

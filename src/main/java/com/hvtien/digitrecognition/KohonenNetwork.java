@@ -237,7 +237,6 @@ public class KohonenNetwork extends Network {
 		bestError = 1.E30;
 
 		retry = 0;
-//		int iii = 0;
 		while (true) {
 			evaluateErrors(wins, biggestError, corrections);
 			totalError = biggestError[0];
@@ -258,7 +257,6 @@ public class KohonenNetwork extends Network {
 				forceWin(wins);
 				// continue;
 			}
-//			System.out.println("iii, totalError: " + (iii++) +", "+totalError);
 			adjustWeights(learningRate, wins, biggestCorrection, corrections);
 
 			//owner.updateStats(retry, totalError, bestError);
@@ -272,7 +270,6 @@ public class KohonenNetwork extends Network {
 				if (++retry > retries)
 					break;
 				initialize();
-				System.out.println("vao day ko?");
 				learningRate = learnRate;
 				continue;
 			}
@@ -292,10 +289,6 @@ public class KohonenNetwork extends Network {
 
 		stop = true;
 		retry++;
-////		System.out.println("retry, totalError, bestError, learningRate: "
-//				+ retry + "," + totalError + "," + bestError + ","
-//				+ learningRate);
-		//owner.updateStats(retry, totalError, bestError);
 	}
 
 	/**

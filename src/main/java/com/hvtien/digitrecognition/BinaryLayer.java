@@ -9,7 +9,7 @@ public class BinaryLayer extends JPanel {
     BinaryData data;
 
     BinaryLayer(int width, int height) {
-        data = new BinaryData(' ', width, height);
+        data = new BinaryData(width, height);
     }
 
     BinaryData getData() {

@@ -16,12 +16,12 @@ public class PictureClassification {
 	Perceptron pct;
 	public PictureClassification()
 	{	
-		pct=new Perceptron(Constants.DEFAULT_SIZE.width, Constants.DEFAULT_SIZE.height);
-		createGUI();
-		pct.loadDataTrain();
+		//pct=new Perceptron(Constants.DEFAULT_SIZE.width, Constants.DEFAULT_SIZE.height);
+		initGUI();
+		//pct.loadDataTrain();
 	}
 
-	private void createGUI() {
+	private void initGUI() {
 		this.frame = new JFrame("Neural Network Learning!");
 		this.frame.setSize(600 ,400);
 		this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -48,6 +48,10 @@ public class PictureClassification {
 		Learn.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
+				BinaryData binaryData = paint.convertBinaryLayer();
+				paint.binaryLayer.setData(binaryData);
+				paint.binaryLayer.repaint();
+				paint.repaint();
 				//pct.learning(paint.image, 0);
 			}
 		});
@@ -87,7 +91,10 @@ public class PictureClassification {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				paint.convertBinaryLayer();
+				BinaryData binaryData = paint.convertBinaryLayer();
+				paint.binaryLayer.setData(binaryData);
+				paint.binaryLayer.repaint();
+				paint.repaint();
 				//double o = pct.output(paintOriginal.image);
 				//l3.setText(""+o);
 				//progressBar6.setValue((new Double((1 - o) * 100)).intValue());

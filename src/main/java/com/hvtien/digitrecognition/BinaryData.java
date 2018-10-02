@@ -1,14 +1,11 @@
 package com.hvtien.digitrecognition;
 
-public class BinaryData implements Comparable, Cloneable {
+public class BinaryData implements Cloneable {
 
     protected boolean grid[][];
 
-    protected char letter;
-
-    BinaryData(char letter, int width, int height) {
+    BinaryData(int width, int height) {
         grid = new boolean[width][height];
-        this.letter = letter;
     }
 
     public void setData(int x, int y, boolean v) {
@@ -33,30 +30,9 @@ public class BinaryData implements Comparable, Cloneable {
         return grid.length;
     }
 
-    public char getLetter() {
-        return letter;
-    }
-
-    public void setLetter(char letter) {
-        this.letter = letter;
-    }
-
-    public int compareTo(Object o) {
-        BinaryData obj = (BinaryData) o;
-        if (this.getLetter() > obj.getLetter())
-            return 1;
-        else
-            return -1;
-    }
-
-    @Override
-    public String toString() {
-        return "" + letter;
-    }
-
     @Override
     public Object clone() {
-        BinaryData obj = new BinaryData(letter, getWidth(), getHeight());
+        BinaryData obj = new BinaryData(getWidth(), getHeight());
         for (int y = 0; y < getHeight(); y++)
             for (int x = 0; x < getWidth(); x++)
                 obj.setData(x, y, getData(x, y));
