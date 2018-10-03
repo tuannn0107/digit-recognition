@@ -1,4 +1,4 @@
-package com.hvtien.digitrecognition;
+package com.hvtien.digitrecognition.original;
 
 import com.hvtien.utils.Constants;
 
@@ -41,9 +41,9 @@ public class PaintOriginal extends JPanel implements MouseListener,
 	}
 	
 	public void clear(){
-		graphics.setColor(Color.WHITE);
+		graphics.setColor(Constants.COLOR_FOR_BACKGROUND);
 		graphics.fillRect(0, 0, Constants.DEFAULT_SIZE.width, Constants.DEFAULT_SIZE.height);
-		graphics.setColor(Color.BLACK);
+		graphics.setColor(Constants.COLOR_FOR_PAINT);
 		repaint();
 	
 	}

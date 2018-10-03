@@ -1,5 +1,7 @@
-package com.hvtien.digitrecognition;
+package com.hvtien.digitrecognition.gui;
 
+
+import com.hvtien.utils.Constants;
 
 import java.awt.AWTEvent;
 import java.awt.Color;
@@ -43,7 +45,7 @@ public class Paint extends JPanel {
 	protected void initImage() {
 		entryImage = createImage(getWidth(), getHeight());
 		entryGraphics = entryImage.getGraphics();
-		entryGraphics.setColor(Color.white);
+		entryGraphics.setColor(Constants.COLOR_FOR_BACKGROUND);
 		entryGraphics.fillRect(0, 0, getWidth(), getHeight());
 	}
 
@@ -52,9 +54,9 @@ public class Paint extends JPanel {
 		if (entryImage == null)
 			initImage();
 		g.drawImage(entryImage, 0, 0, this);
-		g.setColor(Color.black);
+		g.setColor(Constants.COLOR_FOR_PAINT);
 		g.drawRect(0, 0, getWidth(), getHeight());
-		g.setColor(Color.red);
+		g.setColor(Constants.COLOR_FOR_BOUND);
 		g.drawRect(boundLeft - 1, boundTop - 1, boundRight
 				- boundLeft + 2, boundBottom - boundTop + 2);
 
@@ -73,7 +75,7 @@ public class Paint extends JPanel {
 		if (e.getID() != MouseEvent.MOUSE_DRAGGED)
 			return;
 
-		entryGraphics.setColor(Color.black);
+		entryGraphics.setColor(Constants.COLOR_FOR_PAINT);
 		entryGraphics.drawLine(lastX, lastY, e.getX(), e.getY());
 		getGraphics().drawImage(entryImage, 0, 0, this);
 		lastX = e.getX();
@@ -99,7 +101,7 @@ public class Paint extends JPanel {
 		int w = entryImage.getWidth(this);
 		BufferedImage bufferedImage = (BufferedImage) entryImage;
 		for (int i = 0; i < w; i++) {
-			if (bufferedImage.getRGB(i, y) == Color.BLACK.getRGB())
+			if (bufferedImage.getRGB(i, y) == Constants.COLOR_FOR_PAINT_RGB)
 				return true;
 		}
 		return false;
@@ -117,7 +119,7 @@ public class Paint extends JPanel {
 
 		BufferedImage bufferedImage = (BufferedImage) entryImage;
 		for (int i = 0; i < h; i++) {
-			if (bufferedImage.getRGB(x, i) == Color.BLACK.getRGB())
+			if (bufferedImage.getRGB(x, i) == Constants.COLOR_FOR_PAINT_RGB)
 				return true;
 		}
 		return false;
@@ -182,7 +184,7 @@ public class Paint extends JPanel {
 
 		for (int y = startY; y <= endY; y++) {
 			for (int x = startX; x <= endX; x++) {
-				if (bufferedImage.getRGB(x, y) == Color.BLACK.getRGB())
+				if (bufferedImage.getRGB(x, y) == Constants.COLOR_FOR_PAINT_RGB)
 					return true;
 			}
 		}
@@ -210,9 +212,9 @@ public class Paint extends JPanel {
 		for (int y = 0; y < data.getHeight(); y++) {
 			for (int x = 0; x < data.getWidth(); x++) {
 				if (isAbleConverted(x, y))
-					data.setData(x, y, true);
+					data.setData(x, y, 1);
 				else
-					data.setData(x, y, false);
+					data.setData(x, y, 0);
 			}
 		}
 
@@ -221,7 +223,7 @@ public class Paint extends JPanel {
 
 
 	public void clear() {
-		this.entryGraphics.setColor(Color.white);
+		this.entryGraphics.setColor(Constants.COLOR_FOR_BACKGROUND);
 		this.entryGraphics.fillRect(0, 0, getWidth(), getHeight());
 		this.boundBottom = this.boundTop = this.boundLeft = this.boundRight = 0;
 		repaint();

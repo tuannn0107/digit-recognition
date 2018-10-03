@@ -1,6 +1,6 @@
-package com.hvtien.digitrecognition;
+package com.hvtien;
 
-import org.springframework.boot.SpringApplication;
+import com.hvtien.digitrecognition.gui.PictureClassification;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import javax.swing.*;

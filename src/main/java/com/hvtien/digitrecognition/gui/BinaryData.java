@@ -1,25 +1,25 @@
-package com.hvtien.digitrecognition;
+package com.hvtien.digitrecognition.gui;
 
 public class BinaryData implements Cloneable {
 
-    protected boolean grid[][];
+    protected int grid[][];
 
     BinaryData(int width, int height) {
-        grid = new boolean[width][height];
+        grid = new int[width][height];
     }
 
-    public void setData(int x, int y, boolean v) {
+    public void setData(int x, int y, int v) {
         grid[x][y] = v;
     }
 
-    public boolean getData(int x, int y) {
+    public int getData(int x, int y) {
         return grid[x][y];
     }
 
     public void clear() {
         for (int x = 0; x < grid.length; x++)
             for (int y = 0; y < grid[0].length; y++)
-                grid[x][y] = false;
+                grid[x][y] = 0;
     }
 
     public int getHeight() {

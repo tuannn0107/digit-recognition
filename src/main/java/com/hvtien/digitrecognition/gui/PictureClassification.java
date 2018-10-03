@@ -1,9 +1,15 @@
-package com.hvtien.digitrecognition;
+package com.hvtien.digitrecognition.gui;
 
+import com.hvtien.digitrecognition.data.GoodOutputs;
+import com.hvtien.digitrecognition.neural.Train;
+import com.hvtien.digitrecognition.neural.TrainingSet;
+import com.hvtien.digitrecognition.original.Perceptron;
 import com.hvtien.utils.Constants;
+import com.hvtien.utils.Converter;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -13,11 +19,12 @@ import javax.swing.JProgressBar;
 public class PictureClassification {
 	public JFrame frame;
 	public Paint paint;
-	Perceptron pct;
+	private Train networkTrainer;
 	public PictureClassification()
 	{	
 		//pct=new Perceptron(Constants.DEFAULT_SIZE.width, Constants.DEFAULT_SIZE.height);
 		initGUI();
+		networkTrainer = new Train();
 		//pct.loadDataTrain();
 	}
 
@@ -27,14 +34,8 @@ public class PictureClassification {
 		this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.frame.setLayout(null);
 
-		/*paintOriginal = new PaintOriginal();
-		paintOriginal.setBounds(10, 10, Constants.DEFAULT_SIZE.width, Constants.DEFAULT_SIZE.height);
-		this.frame.getContentPane().add(paintOriginal);*/
-
 		paint = new Paint();
 		paint.setBounds(10, 10, Constants.DEFAULT_SIZE.width, Constants.DEFAULT_SIZE.height);
-		// // getContentPane().add(entry);
-		//
 		this.frame.add(paint);
 
 		BinaryLayer binaryLayer = new BinaryLayer((int) Constants.BINARY_LAYER.getWidth(), (int) Constants.BINARY_LAYER.getHeight());
@@ -52,7 +53,8 @@ public class PictureClassification {
 				paint.binaryLayer.setData(binaryData);
 				paint.binaryLayer.repaint();
 				paint.repaint();
-				//pct.learning(paint.image, 0);
+				networkTrainer.train(new TrainingSet(Converter.convertToSingleDemension(binaryData.grid),
+						GoodOutputs.getInstance().getGoodOutput(Constants.DIGIT_LIST[0])));
 			}
 		});
 		this.frame.add(Learn);
@@ -68,10 +70,14 @@ public class PictureClassification {
 		JButton Learn2=new JButton("Digit 9");
 		Learn2.setBounds(320, 285, 100, 25);
 		Learn2.addActionListener(new ActionListener(){
-
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				//pct.learning(paintOriginal.image, 1);
+				BinaryData binaryData = paint.convertBinaryLayer();
+				paint.binaryLayer.setData(binaryData);
+				paint.binaryLayer.repaint();
+				paint.repaint();
+				networkTrainer.train(new TrainingSet(Converter.convertToSingleDemension(binaryData.grid),
+						GoodOutputs.getInstance().getGoodOutput(Constants.DIGIT_LIST[1])));
 			}
 		});
 		this.frame.add(Learn2);
@@ -95,10 +101,12 @@ public class PictureClassification {
 				paint.binaryLayer.setData(binaryData);
 				paint.binaryLayer.repaint();
 				paint.repaint();
-				//double o = pct.output(paintOriginal.image);
-				//l3.setText(""+o);
-				//progressBar6.setValue((new Double((1 - o) * 100)).intValue());
-				//progressBar9.setValue((new Double(o * 100)).intValue());
+
+				networkTrainer.setInputs(Converter.convertToSingleDemension(binaryData.grid));
+
+				ArrayList<Double> outputs = networkTrainer.getOutputs();
+				progressBar6.setValue((int)(outputs.get(0) * 100));
+				progressBar9.setValue((int)(outputs.get(1) * 100));
 			}
 		});
 		this.frame.add(classification);
@@ -109,7 +117,7 @@ public class PictureClassification {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				pct.export();
+				//pct.export();
 			}
 		});
 		this.frame.add(export);
@@ -134,7 +142,7 @@ public class PictureClassification {
 			@Override
 			public void windowClosing(java.awt.event.WindowEvent windowEvent) {
 				// Export before close
-				pct.export();
+				//pct.export();
 			}
 		});
 

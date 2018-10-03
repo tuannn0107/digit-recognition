@@ -1,4 +1,4 @@
-package com.hvtien.digitrecognition;
+package com.hvtien.digitrecognition.original;
 
 import com.hvtien.utils.Constants;
 
@@ -34,7 +34,7 @@ public class Perceptron {
 		double sum=weight[w*h];
 		for (int i=0;i<w;i++) {
 			for (int j=0;j<h;j++) {
-				if (image.getRGB(i, j)==Color.BLACK.getRGB()) {
+				if (image.getRGB(i, j) == Constants.COLOR_FOR_PAINT_RGB) {
 					sum+=weight[i*h+j];
 				}
 			}
@@ -54,7 +54,7 @@ public class Perceptron {
 			double d = alpha * o * (1 - o) * (y - o);
 			for (int i = 0; i < w; i++) {
 				for (int j = 0; j < h; j++) {
-					if (image.getRGB(i, j) == Color.BLACK.getRGB()) {
+					if (image.getRGB(i, j) == Constants.COLOR_FOR_PAINT_RGB) {
 						weight[i * h + j] = weight[i * h + j] + d;
 					}
 				}

@@ -1,4 +1,6 @@
-package com.hvtien.digitrecognition;
+package com.hvtien.digitrecognition.gui;
+
+import com.hvtien.utils.Constants;
 
 import javax.swing.*;
 
@@ -29,10 +31,10 @@ public class BinaryLayer extends JPanel {
         int vcell = getHeight() / data.getHeight();
         int hcell = getWidth() / data.getWidth();
 
-        g.setColor(Color.white); //Background downSample
+        g.setColor(Constants.COLOR_FOR_BACKGROUND); //Background downSample
         g.fillRect(0, 0, getWidth(), getHeight());
 
-        g.setColor(Color.black); //downSampleIntoBounds
+        g.setColor(Constants.COLOR_FOR_PAINT); //downSampleIntoBounds
         for (y = 0; y < data.getHeight(); y++)
             g.drawLine(0, y * vcell, getWidth(), y * vcell);
         for (x = 0; x < data.getWidth(); x++)
@@ -40,12 +42,12 @@ public class BinaryLayer extends JPanel {
 
         for (y = 0; y < data.getHeight(); y++) {
             for (x = 0; x < data.getWidth(); x++) {
-                if (data.getData(x, y))
+                if (data.getData(x, y) == 1)
                     g.fillRect(x * hcell, y * vcell, hcell, vcell);
             }
         }
 
-        g.setColor(Color.black); //downSampleBounds
+        g.setColor(Constants.COLOR_FOR_PAINT); //downSampleBounds
         g.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
 
     }
