@@ -1,38 +1,53 @@
 package com.hvtien.digitrecognition.neural;
 
-import java.util.ArrayList;
+import java.util.*;
 
-public class Network {
+abstract public class Network {
 
-    private ArrayList<Neuron> neurons;
+	protected double[] outputs;
 
-    public Network() {
-        neurons = new ArrayList<>();
-    }
+	protected double totalError;
 
-    public void addNeurons(int count) {
-        for (int i = 0; i < count; i++)
-            neurons.add(new Neuron());
-    }
+	protected int inputCount;
 
-    public void setInputs(ArrayList<Integer> inputs) {
-        for (Neuron n : neurons)
-            n.setInputs(inputs);
-    }
+	protected int outputCount;
 
-    public ArrayList<Double> getOutputs() {
-        ArrayList<Double> outputs = new ArrayList<>();
-        for (Neuron n : neurons)
-            outputs.add(n.getOutput());
+	protected Random random = new Random(System.currentTimeMillis());
 
-        return outputs;
-    }
+	abstract public void learn() throws RuntimeException;
 
-    public void adjustWages(ArrayList<Double> goodOutput) {
-        for (int i = 0; i < neurons.size(); i++) {
-            double delta = goodOutput.get(i) - neurons.get(i).getOutput();
-            neurons.get(i).adjustWeights(delta);
-        }
-    }
+	double[] getOutputs() {
+		return outputs;
+	}
 
+	static double vectorLength(double[] inputs) {
+		double length = 0.0;
+		for (int i = 0; i < inputs.length; i++)
+			length += inputs[i] * inputs[i];
+		return length;
+	}
+
+	double dotProduct(double[] inputs, double[] outputWeights) {
+		int length = inputs.length, i = 0;
+		double dot = 0.0;
+		while ((length--) > 0) {
+			dot += inputs[i] * outputWeights[i];
+			i++;
+		}
+		return dot;
+	}
+
+	void randomizeWeights(double[][] weights) {
+		double r;
+		int temp = (int) (3.464101615 / (2. * Math.random()));
+		for (int y = 0; y < weights.length; y++) {
+			for (int x = 0; x < weights[0].length; x++) {
+				r = (double) random.nextInt(Integer.MAX_VALUE)
+						+ (double) random.nextInt(Integer.MAX_VALUE)
+						- (double) random.nextInt(Integer.MAX_VALUE)
+						- (double) random.nextInt(Integer.MAX_VALUE);
+				weights[y][x] = temp * r;
+			}
+		}
+	}
 }

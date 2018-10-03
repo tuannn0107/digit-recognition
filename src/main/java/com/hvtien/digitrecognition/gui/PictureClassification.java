@@ -1,9 +1,7 @@
 package com.hvtien.digitrecognition.gui;
 
-import com.hvtien.digitrecognition.data.GoodOutputs;
-import com.hvtien.digitrecognition.neural.Train;
+import com.hvtien.digitrecognition.neural.KohonenNetwork;
 import com.hvtien.digitrecognition.neural.TrainingSet;
-import com.hvtien.digitrecognition.original.Perceptron;
 import com.hvtien.utils.Constants;
 import com.hvtien.utils.Converter;
 
@@ -19,12 +17,12 @@ import javax.swing.JProgressBar;
 public class PictureClassification {
 	public JFrame frame;
 	public Paint paint;
-	private Train networkTrainer;
+	private KohonenNetwork networkTrainer;
 	public PictureClassification()
 	{	
 		//pct=new Perceptron(Constants.DEFAULT_SIZE.width, Constants.DEFAULT_SIZE.height);
 		initGUI();
-		networkTrainer = new Train();
+		networkTrainer = new KohonenNetwork((int)Constants.BINARY_LAYER.getWidth(), (int)Constants.BINARY_LAYER.getHeight(), this);
 		//pct.loadDataTrain();
 	}
 
@@ -53,8 +51,6 @@ public class PictureClassification {
 				paint.binaryLayer.setData(binaryData);
 				paint.binaryLayer.repaint();
 				paint.repaint();
-				networkTrainer.train(new TrainingSet(Converter.convertToSingleDemension(binaryData.grid),
-						GoodOutputs.getInstance().getGoodOutput(Constants.DIGIT_LIST[0])));
 			}
 		});
 		this.frame.add(Learn);
@@ -76,8 +72,6 @@ public class PictureClassification {
 				paint.binaryLayer.setData(binaryData);
 				paint.binaryLayer.repaint();
 				paint.repaint();
-				networkTrainer.train(new TrainingSet(Converter.convertToSingleDemension(binaryData.grid),
-						GoodOutputs.getInstance().getGoodOutput(Constants.DIGIT_LIST[1])));
 			}
 		});
 		this.frame.add(Learn2);
@@ -101,12 +95,6 @@ public class PictureClassification {
 				paint.binaryLayer.setData(binaryData);
 				paint.binaryLayer.repaint();
 				paint.repaint();
-
-				networkTrainer.setInputs(Converter.convertToSingleDemension(binaryData.grid));
-
-				ArrayList<Double> outputs = networkTrainer.getOutputs();
-				progressBar6.setValue((int)(outputs.get(0) * 100));
-				progressBar9.setValue((int)(outputs.get(1) * 100));
 			}
 		});
 		this.frame.add(classification);
