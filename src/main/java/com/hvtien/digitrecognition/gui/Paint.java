@@ -222,6 +222,9 @@ public class Paint extends JPanel {
 	}
 
 
+    /**
+     * clear paint
+     */
 	public void clear() {
 		this.entryGraphics.setColor(Constants.COLOR_FOR_BACKGROUND);
 		this.entryGraphics.fillRect(0, 0, getWidth(), getHeight());

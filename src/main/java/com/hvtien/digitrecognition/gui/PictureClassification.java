@@ -1,31 +1,43 @@
 package com.hvtien.digitrecognition.gui;
 
-import com.hvtien.digitrecognition.neural.KohonenNetwork;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hvtien.digitrecognition.data.GoodOutputs;
+import com.hvtien.digitrecognition.neural.Train;
 import com.hvtien.digitrecognition.neural.TrainingSet;
 import com.hvtien.utils.Constants;
 import com.hvtien.utils.Converter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
-
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JProgressBar;
 
 
 public class PictureClassification {
+	private static Logger logger = LoggerFactory.getLogger(PictureClassification.class);
+
 	public JFrame frame;
 	public Paint paint;
-	private KohonenNetwork networkTrainer;
+	private Train networkTrainer;
+
+
+	/**
+	 * constructor
+	 */
 	public PictureClassification()
 	{	
-		//pct=new Perceptron(Constants.DEFAULT_SIZE.width, Constants.DEFAULT_SIZE.height);
 		initGUI();
-		networkTrainer = new KohonenNetwork((int)Constants.BINARY_LAYER.getWidth(), (int)Constants.BINARY_LAYER.getHeight(), this);
-		//pct.loadDataTrain();
+		networkTrainer = new Train();
+		loadDataTrain();
 	}
 
+	/**
+	 * init gui
+	 */
 	private void initGUI() {
 		this.frame = new JFrame("Neural Network Learning!");
 		this.frame.setSize(600 ,400);
@@ -51,6 +63,9 @@ public class PictureClassification {
 				paint.binaryLayer.setData(binaryData);
 				paint.binaryLayer.repaint();
 				paint.repaint();
+				networkTrainer.addTrainingSet(new TrainingSet(Converter.convertToSingleDimension(binaryData.grid),
+						GoodOutputs.getInstance().getGoodOutput(Constants.DIGIT_LIST[0])));
+				networkTrainer.train();
 			}
 		});
 		this.frame.add(Learn);
@@ -72,6 +87,9 @@ public class PictureClassification {
 				paint.binaryLayer.setData(binaryData);
 				paint.binaryLayer.repaint();
 				paint.repaint();
+				networkTrainer.addTrainingSet(new TrainingSet(Converter.convertToSingleDimension(binaryData.grid),
+						GoodOutputs.getInstance().getGoodOutput(Constants.DIGIT_LIST[1])));
+				networkTrainer.train();
 			}
 		});
 		this.frame.add(Learn2);
@@ -84,7 +102,6 @@ public class PictureClassification {
 		progressBar9.setBounds(430, 290, 130, 15);
 		this.frame.add(progressBar9);
 
-
 		JButton classification = new JButton("Classification");
 		classification.setBounds(320, 320, 100, 25);
 		classification.addActionListener(new ActionListener(){
@@ -95,6 +112,12 @@ public class PictureClassification {
 				paint.binaryLayer.setData(binaryData);
 				paint.binaryLayer.repaint();
 				paint.repaint();
+
+				networkTrainer.setInputs(Converter.convertToSingleDimension(binaryData.grid));
+
+				ArrayList<Double> outputs = networkTrainer.getOutputs();
+				progressBar6.setValue((int)(outputs.get(0) * 100));
+				progressBar9.setValue((int)(outputs.get(1) * 100));
 			}
 		});
 		this.frame.add(classification);
@@ -102,10 +125,9 @@ public class PictureClassification {
 		JButton export = new JButton("Export");
 		export.setBounds(430, 320, 100, 25);
 		export.addActionListener(new ActionListener(){
-
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				//pct.export();
+				exportDataTrain();
 			}
 		});
 		this.frame.add(export);
@@ -113,13 +135,11 @@ public class PictureClassification {
 		JButton clear = new JButton("Clear");
 		clear.setBounds(240, 320, 70, 25);
 		clear.addActionListener(new ActionListener(){
-
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				paint.clear();
 				binaryLayer.getData().clear();
 				binaryLayer.repaint();
-//				l3.setText("");
 				progressBar6.setValue(0);
 				progressBar9.setValue(0);
 			}
@@ -130,10 +150,38 @@ public class PictureClassification {
 			@Override
 			public void windowClosing(java.awt.event.WindowEvent windowEvent) {
 				// Export before close
-				//pct.export();
+				//exportDataTrain();
 			}
 		});
 
 		frame.setVisible(true);
+	}
+
+
+
+	private void loadDataTrain() {
+		logger.info("Start import data train for json file.");
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			networkTrainer = mapper.readValue(new File(Constants.RESOURCES_PATH + Constants.FILE_DATA_TRAIN), Train.class);
+            logger.info("Import data train sucessfully.");
+		} catch (IOException e) {
+			logger.error("Could not parse object from json file." + e);
+		}
+	}
+
+
+	/**
+	 * Export data train
+	 */
+	private void exportDataTrain() {
+		logger.info("Start export data train for json file.");
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			mapper.writerWithDefaultPrettyPrinter().writeValue(new File(Constants.RESOURCES_PATH + Constants.FILE_DATA_TRAIN), networkTrainer);
+			logger.info("Create json file for data train successfully.");
+		} catch (IOException e) {
+			logger.error("Could not write object to json file.");
+		}
 	}
 }
