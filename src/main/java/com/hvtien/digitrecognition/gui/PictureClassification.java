@@ -116,8 +116,8 @@ public class PictureClassification {
 				networkTrainer.setInputs(Converter.convertToSingleDimension(binaryData.grid));
 
 				ArrayList<Double> outputs = networkTrainer.getOutputs();
-				progressBar6.setValue((int)(outputs.get(0) * 100));
-				progressBar9.setValue((int)(outputs.get(1) * 100));
+				progressBar6.setValue((int)((outputs.get(0) / (outputs.get(0) + outputs.get(1))) * 100));
+				progressBar9.setValue((int)((outputs.get(1) / (outputs.get(0) + outputs.get(1))) * 100));
 			}
 		});
 		this.frame.add(classification);

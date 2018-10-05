@@ -7,7 +7,7 @@ import java.util.ArrayList;
 public class Neuron {
 
     private static final int BIAS = 1;
-    private static final double LEARNING_RATIO = 0.1;
+    private static final double LEARNING_RATIO = 0.3;
 
     private ArrayList<Integer> inputs;
     private ArrayList<Double> weights;
